@@ -1,32 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Quicksand:wght@400;500;600;700&display=swap');
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+
+* {
   margin: 0;
   padding: 0;
 }
 
-:root {
-  /* 🌿 Amigos da Fauna — earthy identity palette */
-  --bg-primary: #F5F1E3;
-  --bg-secondary: #EDE8D6;
-  --bg-card: rgba(93, 64, 55, 0.06);
-  --border-card: rgba(93, 64, 55, 0.14);
 
-  --text-primary: #5D4037;
-  --text-secondary: #7A6A5E;
+
+:root {
+  --font-heading: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --font-body: 'Quicksand', system-ui, -apple-system, sans-serif;
 
   --accent: #4A5D23;
   --accent-light: #6B7F3A;
   --accent-warm: #D38345;
-
-  --danger: #C0392B;
-  --success: #4A5D23;
-
-  --font-heading: 'Montserrat', system-ui, -apple-system, sans-serif;
-  --font-body: 'Quicksand', system-ui, -apple-system, sans-serif;
+  --text-primary: #5D4037;
+  --text-secondary: #7A6A5E;
+  --bg-primary: #F5F1E3;
 }
 
 html {
@@ -35,25 +26,14 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  font-family: var(--font-body);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  min-height: 90vh;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-}
-
-a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-a:hover {
-  color: var(--accent-warm);
+/* Headings use Montserrat (Ant sets Quicksand globally via token) */
+h1, h2, h3, h4, h5, h6,
+.ant-typography h1,
+.ant-typography h2,
+.ant-typography h3,
+.ant-typography h4,
+.ant-typography h5 {
+  font-family: var(--font-heading) !important;
 }
 
 ::selection {
@@ -61,7 +41,7 @@ a:hover {
   color: #5D4037;
 }
 
-/* Add bottom padding on mobile so content isn't hidden behind the bottom navbar */
+/* Bottom padding on mobile so content isn't hidden behind the bottom navbar */
 @media (max-width: 768px) {
   body {
     padding-bottom: 4.5rem;

@@ -1,161 +1,145 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Form, Input, Button, Alert, Typography, Card, Space, Result } from 'antd';
 import { userService } from '../../services';
-import './Register.css';
-import { IoMdEye } from "react-icons/io";
-import { IoMdEyeOff } from "react-icons/io";
+import { useOnlineStatus } from '../../components/userStatus/status';
 
-interface FormErrors {
-  name?: string;
-  email?: string;
-  password?: string;
-}
+const { Title, Text } = Typography;
 
 function Register() {
   const navigate = useNavigate();
-
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [form] = Form.useForm();
+  const isOnline = useOnlineStatus()
   const [apiError, setApiError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
-  function validate(): FormErrors {
-    const errs: FormErrors = {};
-
-    if (!name.trim()) {
-      errs.name = 'O nome é obrigatório';
-    } else if (name.trim().length < 3) {
-      errs.name = 'O nome deve ter pelo menos 3 caracteres';
+  async function handleFinish(values: { name: string; email: string; password: string }) {
+    if(!isOnline){
+      setApiError('Você está offline. Crie sua conta quando tiver conexão com a internet.');
+      return;
     }
-
-    if (!email.trim()) {
-      errs.email = 'O e-mail é obrigatório';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errs.email = 'Informe um e-mail válido';
-    }
-
-    if (!password) {
-      errs.password = 'A senha é obrigatória';
-    } else if (password.length < 6) {
-      errs.password = 'A senha deve ter pelo menos 6 caracteres';
-    }
-
-    return errs;
-  }
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  }
-
-  async function handleSubmit(e: React.SubmitEvent) {
-    e.preventDefault();
     setApiError('');
-
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-
     setSubmitting(true);
 
     try {
-      await userService.register({ name: name.trim(), email: email.trim(), password });
+      await userService.register({
+        name: values.name.trim(),
+        email: values.email.trim(),
+        password: values.password,
+      });
       setSuccess(true);
       setTimeout(() => navigate('/'), 2000);
-    } catch (err:any) {
-      if (err instanceof Error) {
-        setApiError(err.message.includes('422')
-          ? 'Dados inválidos. Verifique os campos e tente novamente.'
-          : err.message ? err.message :'Erro ao criar conta. Tente novamente mais tarde.');
-      }
+    } catch (err: any) {
+        setApiError(
+          err.message || 'Erro ao criar conta. Tente novamente mais tarde.'
+        );
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="page register-page">
-      <div className="register-card">
-        <div className="register-header">
-          <span className="register-icon">🌿</span>
-          <h1>Criar conta</h1>
-          <p className="register-subtitle">Junte-se aos Amigos da Fauna</p>
-        </div>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 80px)', padding: '2rem 1rem' }}>
+      <Card
+        style={{ width: '100%', maxWidth: 420 }}
+        styles={{ body: { padding: '2.5rem 2rem' } }}
+      >
+        <Space direction="vertical" size="small" style={{ width: '100%', textAlign: 'center', marginBottom: 24 }}>
+          <span style={{ fontSize: '2.2rem' }}>🌿</span>
+          <Title level={2} style={{ marginBottom: 4 }}>Criar conta</Title>
+          <Text type="secondary">Junte-se aos Amigos da Fauna</Text>
+        </Space>
 
         {success ? (
-          <div className="register-success">
-            <span className="success-icon">✅</span>
-            <p>Conta criada com sucesso!</p>
-            <p className="success-redirect">Redirecionando…</p>
-          </div>
+          <Result
+            status="success"
+            title="Conta criada com sucesso!"
+            subTitle="Redirecionando…"
+          />
         ) : (
-          <form className="register-form" onSubmit={handleSubmit} noValidate>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleFinish}
+            requiredMark={false}
+            size="large"
+          >
             {apiError && (
-              <div className="register-api-error" role="alert">
-                {apiError}
-              </div>
+              <Form.Item>
+                <Alert message={apiError} type="error" showIcon />
+              </Form.Item>
             )}
 
-            <div className={`form-field ${errors.name ? 'has-error' : ''}`}>
-              <label htmlFor="register-name">Nome</label>
-              <input
+            <Form.Item
+              label="Nome"
+              name="name"
+              rules={[
+                { required: true, message: 'O nome é obrigatório' },
+                { min: 3, message: 'O nome deve ter pelo menos 3 caracteres' },
+              ]}
+            >
+              <Input
                 id="register-name"
-                type="text"
                 placeholder="Seu nome completo"
-                value={name}
-                onChange={(e) => { setName(e.target.value); setErrors((p) => ({ ...p, name: undefined })); }}
                 autoComplete="name"
               />
-              {errors.name && <span className="field-error">{errors.name}</span>}
-            </div>
+            </Form.Item>
 
-            <div className={`form-field ${errors.email ? 'has-error' : ''}`}>
-              <label htmlFor="register-email">E-mail</label>
-              <input
+            <Form.Item
+              label="E-mail"
+              name="email"
+              rules={[
+                { required: true, message: 'O e-mail é obrigatório' },
+                { type: 'email', message: 'Informe um e-mail válido' },
+              ]}
+            >
+              <Input
                 id="register-email"
-                type="email"
                 placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => { setEmail(e.target.value); setErrors((p) => ({ ...p, email: undefined })); }}
                 autoComplete="email"
               />
-              {errors.email && <span className="field-error">{errors.email}</span>}
-            </div>
+            </Form.Item>
 
-            <div className={`form-field ${errors.password ? 'has-error' : ''}`}>
-              <label htmlFor="register-password">Senha</label>
-              <div className='password-container'>
-              <input
+            <Form.Item
+              label="Senha"
+              name="password"
+              rules={[
+                { required: true, message: 'A senha é obrigatória' },
+                { min: 6, message: 'A senha deve ter pelo menos 6 caracteres' },
+              ]}
+            >
+              <Input.Password
                 id="register-password"
-                type={showPassword ? "text" : "password"}
                 placeholder="Mínimo 6 caracteres"
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); setErrors((p) => ({ ...p, password: undefined })); }}
                 autoComplete="new-password"
               />
-              <p onClick={togglePasswordVisibility} className='seeAndHidePassword'>{showPassword ? <IoMdEyeOff/> : <IoMdEye/>}</p>
-              </div>
-              {errors.password && <span className="field-error">{errors.password}</span>}
-            </div>
+            </Form.Item>
 
-            <button
-              type="submit"
-              className="register-submit"
-              disabled={submitting}
-              id="register-submit-btn"
-            >
-              {submitting ? 'Criando conta…' : 'Cadastrar'}
-            </button>
+            <Form.Item style={{ marginTop: 8 }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                loading={submitting}
+                id="register-submit-btn"
+                style={{
+                  height: 48,
+                  fontWeight: 700,
+                  fontSize: '1.05rem',
+                  background: 'linear-gradient(135deg, #4A5D23 0%, #6B7F3A 100%)',
+                }}
+              >
+                {submitting ? 'Criando conta…' : 'Cadastrar'}
+              </Button>
+            </Form.Item>
 
-            <p className="register-login-link">
-              Já tem uma conta? <Link to="/login">Entrar</Link>
-            </p>
-          </form>
+            <Text type="secondary" style={{ display: 'block', textAlign: 'center' }}>
+              Já tem uma conta? <Link to="/login" style={{ fontWeight: 700 }}>Entrar</Link>
+            </Text>
+          </Form>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

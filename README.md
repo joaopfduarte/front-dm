@@ -1,73 +1,53 @@
-# React + TypeScript + Vite
+# Amigos da Fauna
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+O projeto **Amigos da Fauna** é uma aplicação web voltada para a conscientização e educação ambiental, focando nas espécies da nossa fauna (Mata Atlântica). O sistema permite que os usuários aprendam sobre diferentes animais, vejam onde habitam e testem seus conhecimentos através de quizzes interativos.
 
-Currently, two official plugins are available:
+## Descrição das Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Autenticação de Usuários:** Cadastro estruturado e login seguro com suporte a feedback de conectividade e alertas.
+- **Catálogo de Animais:** Listagem interativa e paginada de animais (incluindo imagens, características, altura e peso).
+- **Busca em Tempo Real:** Pesquisa dinâmica filtrando as espécies pelo nome.
+- **Mapa de Localização:** Mapeamento visual das espécies (integração via Leaflet/OpenStreetMap) para visualização global das áreas de ocupação.
+- **Quiz Educativo:** Sistema de perguntas e respostas sobre atributos e hábitos específicos de cada animal listado, pontuando os acertos e erros.
+- **Aplicação PWA (Progressive Web App):** Tratamento de conectividade offline com detecção e alertas embutidos (`OfflineBanner`).
+- **Compartilhamento:** Funcionalidade nativa para compartilhamento dos links de cada animal para as redes ou aplicativos de mensagem.
 
-## React Compiler
+## Tecnologias Utilizadas
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Core Engine:** React, TypeScript
+- **Build Tool:** Vite
+- **Roteamento:** React Router DOM
+- **UI/UX e Componentes:** Ant Design (antd)
+- **Mapas e Geolocalização:** Leaflet (via React Leaflet)
+- **Notificação e Feedback:** Sonner (Toast notifications)
+- **Offline / Caching:** `vite-plugin-pwa`
 
-## Expanding the ESLint configuration
+## Instruções de Execução
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Siga os passos abaixo para preparar e executar a aplicação no seu ambiente de desenvolvimento:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. **Acesse o diretório raiz do projeto:**
+   Abra seu terminal e garanta que você está na pasta do frontend:
+   ```bash
+   cd dm-web
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2. **Instale as dependências:**
+   Instale as bibliotecas e pacotes do React com seu gerenciador de pacotes:
+   ```bash
+   npm install
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3. **Configuração de Variáveis de Ambiente (Opcional):**
+   O projeto irá consumir a API oficial `https://api-dm-69db35e2f2d0.herokuapp.com/` por padrão, caso necessite, crie ou altere no arquivo `.env` as configurações de ambiente requisitadas pelo sistema.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4. **Inicie o Servidor de Desenvolvimento:**
+   Rode a aplicação localmente de forma rápida com Hot-Module-Replacement:
+   ```bash
+   npm run dev
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+5. **Acesse o Projeto:**
+   Após a compilação local, o Vite abrirá as conexões na porta (usualmente `http://localhost:5173`). Acesse via navegador!
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+> *Projeto mantido com foco nas boas práticas de acessibilidade, tipagem estática e UX dinâmica focada na educação ambiental* 🌿

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import './Dashboard.css';
+import { Card, Row, Col, Statistic, Skeleton, Typography } from 'antd';
+import { ArrowUpOutlined, ArrowDownOutlined, ArrowRightOutlined } from '@ant-design/icons';
+
+const { Title } = Typography;
 
 interface StatCard {
   label: string;
@@ -14,37 +17,51 @@ const MOCK_STATS: StatCard[] = [
   { label: 'Bounce Rate', value: '24.3%', trend: 'down' },
 ];
 
-function Dashboard(){
+const trendConfig = {
+  up: { icon: <ArrowUpOutlined />, color: '#4A5D23' },
+  down: { icon: <ArrowDownOutlined />, color: '#C0392B' },
+  neutral: { icon: <ArrowRightOutlined />, color: '#7A6A5E' },
+};
+
+function Dashboard() {
   const [stats, setStats] = useState<StatCard[]>([]);
 
   useEffect(() => {
-    // Simulate fetching data — replace with a real service call
     const timer = setTimeout(() => setStats(MOCK_STATS), 400);
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="page dashboard-page">
-      <h1>Dashboard</h1>
-      <div className="stats-grid">
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem 1rem' }}>
+      <Title level={2}>Dashboard</Title>
+
+      <Row gutter={[20, 20]}>
         {stats.length === 0
           ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="stat-card skeleton" />
+              <Col key={i} xs={24} sm={12} md={6}>
+                <Card>
+                  <Skeleton active paragraph={{ rows: 1 }} />
+                </Card>
+              </Col>
             ))
           : stats.map((stat) => (
-              <div key={stat.label} className="stat-card">
-                <span className="stat-label">{stat.label}</span>
-                <span className="stat-value">{stat.value}</span>
-                <span className={`stat-trend ${stat.trend}`}>
-                  {stat.trend === 'up' && '↑'}
-                  {stat.trend === 'down' && '↓'}
-                  {stat.trend === 'neutral' && '→'}
-                </span>
-              </div>
+              <Col key={stat.label} xs={24} sm={12} md={6}>
+                <Card hoverable>
+                  <Statistic
+                    title={stat.label}
+                    value={stat.value}
+                    prefix={trendConfig[stat.trend].icon}
+                    valueStyle={{
+                      color: trendConfig[stat.trend].color,
+                      fontFamily: "'Montserrat', system-ui, sans-serif",
+                    }}
+                  />
+                </Card>
+              </Col>
             ))}
-      </div>
+      </Row>
     </div>
   );
-};
+}
 
 export default Dashboard;

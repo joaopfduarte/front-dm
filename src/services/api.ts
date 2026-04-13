@@ -1,5 +1,5 @@
 // Base API configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api-dm-69db35e2f2d0.herokuapp.com';
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string>;
@@ -32,9 +32,11 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
   }
 
   if (!response.ok) {
-    throw new Error(
-      data?.detail || `API Error: ${response.status} ${response.statusText}`
-    );
+    console.log(data)
+    const error = new Error(data.detail || 'Ocorreu um erro ao realizar operação') as any;
+    error.status = response.status;
+    error.data = data;
+    throw error;
   }
 
   return data as T;

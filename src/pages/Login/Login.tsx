@@ -1,133 +1,121 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Form, Input, Button, Alert, Typography, Card, Space } from 'antd';
 import { userService } from '../../services';
-import './Login.css';
-import { IoMdEye } from "react-icons/io";
-import { IoMdEyeOff } from "react-icons/io";
+import { useOnlineStatus } from '../../components/userStatus/status';
 
-interface FormErrors {
-  email?: string;
-  password?: string;
-}
+const { Title, Text } = Typography;
 
 function Login() {
+  const isOnline = useOnlineStatus()
   const navigate = useNavigate();
+  const [form] = Form.useForm();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<FormErrors>({});
   const [apiError, setApiError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
-  function validate(): FormErrors {
-    const errs: FormErrors = {};
-
-    if (!email.trim()) {
-      errs.email = 'O e-mail é obrigatório';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errs.email = 'Informe um e-mail válido';
+  async function handleFinish(values: { email: string; password: string }) {
+    
+    if(!isOnline){
+      setApiError('Você está offline. Faça login quando tiver conexão com a internet.');
+      return;
     }
-
-    if (!password) {
-      errs.password = 'A senha é obrigatória';
-    } else if (password.length < 6) {
-      errs.password = 'A senha deve ter pelo menos 6 caracteres';
-    }
-
-    return errs;
-  }
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
     setApiError('');
-
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-
     setSubmitting(true);
 
     try {
-      await userService.login({ email: email.trim(), password });
+      await userService.login({ email: values.email.trim(), password: values.password });
       navigate('/');
     } catch (err: any) {
-      if (err instanceof Error) {
         setApiError(
-          err.message.includes('422')
-            ? 'Dados inválidos. Verifique os campos e tente novamente.'
-            : err.message
-              ? err.message
-              : 'Erro ao entrar. Tente novamente mais tarde.'
+          err.status == 422 ?
+             'Dados inválidos. Verifique os campos e tente novamente.'
+            : err.message || 'Erro ao entrar. Tente novamente mais tarde.'
         );
-      }
+      
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="page login-page">
-      <div className="login-card">
-        <div className="login-header">
-          <span className="login-icon">🌿</span>
-          <h1>Entrar</h1>
-          <p className="login-subtitle">Bem-vindo de volta!</p>
-        </div>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 80px)', padding: '2rem 1rem' }}>
+      <Card
+        style={{ width: '100%', maxWidth: 420 }}
+        styles={{ body: { padding: '2.5rem 2rem' } }}
+      >
+        <Space direction="vertical" size="small" style={{ width: '100%', textAlign: 'center', marginBottom: 24 }}>
+          <span style={{ fontSize: '2.2rem' }}>🌿</span>
+          <Title level={2} style={{ marginBottom: 4 }}>Entrar</Title>
+          <Text type="secondary">Bem-vindo de volta!</Text>
+        </Space>
 
-        <form className="login-form" onSubmit={handleSubmit} noValidate>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleFinish}
+          requiredMark={false}
+          size="large"
+        >
           {apiError && (
-            <div className="login-api-error" role="alert">
-              {apiError}
-            </div>
+            <Form.Item>
+              <Alert message={apiError} type="error" showIcon />
+            </Form.Item>
           )}
 
-          <div className={`form-field ${errors.email ? 'has-error' : ''}`}>
-            <label htmlFor="login-email">E-mail</label>
-            <input
+          <Form.Item
+            label="E-mail"
+            name="email"
+            rules={[
+              { required: true, message: 'O e-mail é obrigatório' },
+              { type: 'email', message: 'Informe um e-mail válido' },
+            ]}
+          >
+            <Input
               id="login-email"
-              type="email"
               placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setErrors((p) => ({ ...p, email: undefined })); }}
               autoComplete="email"
             />
-            {errors.email && <span className="field-error">{errors.email}</span>}
-          </div>
+          </Form.Item>
 
-          <div className={`form-field ${errors.password ? 'has-error' : ''}`}>
-            <label htmlFor="login-password">Senha</label>
-            <div className='password-container'>
-            <input
+          <Form.Item
+            label="Senha"
+            name="password"
+            rules={[
+              { required: true, message: 'A senha é obrigatória' },
+              { min: 6, message: 'A senha deve ter pelo menos 6 caracteres' },
+            ]}
+          >
+            <Input.Password
               id="login-password"
-              type={showPassword ? "text" : "password"}
               placeholder="Sua senha"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setErrors((p) => ({ ...p, password: undefined })); }}
               autoComplete="current-password"
             />
-            <p onClick={togglePasswordVisibility} className='seeAndHidePassword'>{showPassword ? <IoMdEyeOff/> : <IoMdEye/>}</p>
-            </div>
-            {errors.password && <span className="field-error">{errors.password}</span>}
-          </div>
+          </Form.Item>
 
-          <button
-            type="submit"
-            className="login-submit"
-            disabled={submitting}
-            id="login-submit-btn"
-          >
-            {submitting ? 'Entrando…' : 'Entrar'}
-          </button>
+          <Form.Item style={{ marginTop: 8 }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              loading={submitting}
+              id="login-submit-btn"
+              style={{
+                height: 48,
+                fontWeight: 700,
+                fontSize: '1.05rem',
+                background: 'linear-gradient(135deg, #4A5D23 0%, #6B7F3A 100%)',
+              }}
+            >
+              {submitting ? 'Entrando…' : 'Entrar'}
+            </Button>
+          </Form.Item>
 
-          <p className="login-register-link">
-            Não tem uma conta? <Link to="/register">Cadastrar</Link>
-          </p>
-        </form>
-      </div>
+          <Text type="secondary" style={{ display: 'block', textAlign: 'center' }}>
+            Não tem uma conta? <Link to="/register" style={{ fontWeight: 700 }}>Cadastrar</Link>
+          </Text>
+        </Form>
+      </Card>
     </div>
   );
 }

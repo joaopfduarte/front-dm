@@ -1,14 +1,13 @@
 /* ─── Desktop: top sticky bar ─── */
-.navbar {
+.fauna-navbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 2rem;
+  padding: 0.5rem 2rem;
   background: rgba(245, 241, 227, 0.92);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(93, 64, 55, 0.12);
-  position: sticky;
   top: 0;
+  position: sticky;
   z-index: 100;
 }
 
@@ -23,6 +22,20 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  white-space: nowrap;
+}
+
+.navbar-menu .ant-menu-item {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.navbar-menu {
+  height: 60px;
+}
+
+.navbar-menu .ant-menu-item {
+  height: 60px !important;
 }
 
 .brand-icon {
@@ -30,75 +43,68 @@
   font-size: 1.3rem;
 }
 
-.navbar-links {
-  display: flex;
-  list-style: none;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
+/* Override Ant Menu defaults for our earthy palette */
+.navbar-menu .ant-menu-item {
+  font-family: var(--font-body) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
 }
 
-.navbar-links a {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  text-decoration: none;
-  color: #7A6A5E;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: color 0.2s, background 0.2s;
+.navbar-menu .ant-menu-item-selected {
+  color: var(--accent) !important;
 }
 
-.navbar-links a:hover {
-  color: #5D4037;
-  background: rgba(93, 64, 55, 0.08);
-}
-
-.navbar-links a.active {
-  color: #4A5D23;
-  background: rgba(74, 93, 35, 0.1);
-}
-
-.nav-icon {
-  font-size: 1.1rem;
-  line-height: 1;
+.navbar-menu .ant-menu-ink-bar {
+  display: none !important;
 }
 
 /* ─── Mobile: bottom tab bar ─── */
 @media (max-width: 768px) {
-  .navbar {
+  .fauna-navbar {
     position: fixed;
     top: auto;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 0.5rem 0;
+    padding: 0;
     border-bottom: none;
     border-top: 1px solid rgba(93, 64, 55, 0.12);
+    
     justify-content: center;
+    flex-direction: column;
+    
   }
 
   .navbar-brand {
     display: none;
   }
 
-  .navbar-links {
+  .navbar-menu {
     width: 100%;
-    justify-content: space-around;
+    justify-content: space-around !important;
   }
 
-  .navbar-links a {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.75rem;
-    border-radius: 10px;
+  .navbar-menu .ant-menu-item {
+    flex: 1;
+    text-align: center;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.15rem;
+    padding: 0.4rem 0 !important;
+    font-size: 0.72rem !important;
+    line-height: 1.2 !important;
+    height: auto !important;
   }
 
-  .nav-icon {
-    font-size: 1.35rem;
+  .navbar-menu .ant-menu-item .anticon {
+    font-size: 1.35rem !important;
+    margin-inline-end: 0 !important;
+  }
+
+  .navbar-menu .ant-menu-title-content {
+    margin-inline-start: 0 !important;
+    margin-left: 0 !important;
+    transition: none;
   }
 }
